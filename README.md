@@ -25,14 +25,26 @@ Rename `.env.sample` to `.env` and set the variables accordingly.
 
 To use any of the Govee API functions, you first need a connection reference. The connection refrence can then be fed to either the Lights library or the Plugs library, or even both if you have both Govee Lights and Plugs.
 
+Using the full name:
 ```php
 // Ensure we have the composer libraries
 require_once ('vendor/autoload.php');
 
-// Instantiate with defaults
-$govee = new dutchie027\GoveeApiV2\Connect()
+// Instantiate & Connect
+$govee = new dutchie027\GoveeApiV2\Connect();
+```
 
-## Connect (Core) Functions
+Using a namespace:
+```php
+// Ensure we have the composer libraries
+require_once ('vendor/autoload.php');
+
+// Namespace
+use dutchie027\GoveeApiV2\Connect;
+
+// Instantiate with defaults
+$govee = new Connect();
+```
 
 ### Get Device Count
 
