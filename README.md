@@ -1,3 +1,5 @@
+[![Latest Stable Version](http://poser.pugx.org/dutchie027/govee-api-v2/v)](https://packagist.org/packages/dutchie027/govee-api-v2) [![Total Downloads](http://poser.pugx.org/dutchie027/govee-api-v2/downloads)](https://packagist.org/packages/dutchie027/govee-api-v2) [![Latest Unstable Version](http://poser.pugx.org/dutchie027/govee-api-v2/v/unstable)](https://packagist.org/packages/dutchie027/govee-api-v2) [![License](http://poser.pugx.org/dutchie027/govee-api-v2/license)](https://packagist.org/packages/dutchie027/govee-api-v2) [![PHP Version Require](http://poser.pugx.org/dutchie027/govee-api-v2/require/php)](https://packagist.org/packages/dutchie027/govee-api-v2)
+
 # Govee PHP API v2
 This is a rewrite of the Govee API I wrote a while back. Govee changed the API to be more robust, so I am rewriting the code to accommodate.
 
