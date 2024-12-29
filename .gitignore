@@ -1,0 +1,7 @@
+/vendor/
+/build/
+/logs/
+/resources/
+/.build/
+.php-cs-fixer.cache
+.env

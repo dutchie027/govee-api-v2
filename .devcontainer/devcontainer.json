@@ -1,0 +1,37 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/php
+{
+  "name": "PHP Govee API v2 Dev Container",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "image": "mcr.microsoft.com/devcontainers/php",
+  // Configure tool-specific properties.
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      "extensions": [
+        "ikappas.composer",
+        "bmewburn.vscode-intelephense-client",
+        "junstyle.php-cs-fixer",
+        "ms-azuretools.vscode-docker",
+        "neilbrayfield.php-docblocker",
+        "pranaygp.vscode-css-peek",
+        "recca0120.vscode-phpunit",
+        "xdebug.php-debug",
+        "mblode.twig-language",
+        "EditorConfig.EditorConfig"
+      ],
+      "settings": {
+       				"editor.rulers": [80,120]
+      }
+    }
+  },
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [
+    8080,9000
+  ],
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "docker-php-ext-install pdo pdo_mysql && if [ -f composer.json ];then composer install;fi",
+  // "postCreateCommand": "docker-php-ext-install pdo pdo_mysql",
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  "remoteUser": "root"
+}

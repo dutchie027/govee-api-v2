@@ -1,0 +1,46 @@
+{
+    "name": "dutchie027/govee-api-v2",
+    "description": "API Using Govee's newer OpenAPI Spec",
+    "type": "library",
+    "require": {
+        "monolog/monolog": "^3.8",
+        "guzzlehttp/guzzle": "^7.9",
+        "vlucas/phpdotenv": "^5.6",
+        "oittaa/uuid": "^1.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "dutchie027\\GoveeApiV2\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Justin Rodino",
+            "email": "justin@rodino.dev"
+        }
+    ],
+    "scripts": {
+        "fix": "./vendor/bin/php-cs-fixer fix",
+        "test": "./vendor/bin/phpunit",
+        "stan": "./vendor/bin/phpstan --no-progress",
+        "psalm": "./vendor/bin/psalm.phar --no-progress --show-info=true",
+        "runall": [
+            "@fix",
+            "@test",
+            "@stan",
+            "@psalm"
+        ]
+    },
+    "scripts-descriptions": {
+        "test": "Runs phpunit tests",
+        "fix": "Runs PHP-CS Fixer",
+        "stan": "Runs phpstan to check standards",
+        "psalm": "Runs psalm to check code",
+        "runall": "Runs all tests (fixer, phpunit, phpstan, psalm)"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.0",
+        "vimeo/psalm": "^5.26",
+        "friendsofphp/php-cs-fixer": "^3.66"
+    }
+}
