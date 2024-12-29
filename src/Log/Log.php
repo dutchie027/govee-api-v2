@@ -9,7 +9,6 @@ use Monolog\Logger;
 
 final class Log
 {
-    
     /**
      * 'DEBUG'|'INFO'|'NOTICE'|'WARNING'|'ERROR'|'CRITICAL'|'ALERT'|'EMERGENCY'
      */
@@ -46,7 +45,6 @@ final class Log
             mkdir($_ENV['LOG_DIR'], 0700, true);
         }
         $logger = new Logger($_ENV['LOG_PREFIX']);
-        /** @phpstan-ignore-next-line */
         $log_level = in_array($_ENV['LOG_LEVEL'], self::ALLOWED_LEVELS, true) ? $_ENV['LOG_LEVEL'] : 200;
         $logger->pushHandler(new StreamHandler($_ENV['LOG_DIR'] . DIRECTORY_SEPARATOR . $_ENV['LOG_PREFIX'] . '.log', $log_level));
         self::$instance = $logger;

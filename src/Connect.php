@@ -2,10 +2,11 @@
 
 namespace dutchie027\GoveeApiV2;
 
-use GuzzleHttp\Client as Guzzle;
-use GuzzleHttp\Exception\RequestException;
 use Dotenv\Dotenv;
 use dutchie027\GoveeApiV2\Log\Log;
+use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Exception\RequestException;
+use Psr\Http\Message\ResponseInterface;
 
 class Connect
 {
@@ -84,90 +85,94 @@ class Connect
      */
     public function __construct(Guzzle $client = null)
     {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../'); 
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
         $dotenv->load();
         $this->p_token = $_ENV['API_TOKEN'];
         $this->client = $client ?: new Guzzle();
     }
 
     /**
-     * setRateVars
-     * Takes a header array and sets the rate variables
-     *
-     * @param array $header
-     *
-     * @return void
-     */
-    public function setRateVars(array $header): void
-    {
-        // print_r($header);
-        // $this->rate_remain = $header['X-RateLimit-Remaining'];
-        // $this->rate_reset = $header['X-RateLimit-Reset'];
-        // $this->rate_total = $header['X-RateLimit-Limit'];
-        // Log::debug("Rate Remaining: " . $this->rate_remain);
-        // Log::debug("Rate Reset: " . $this->rate_reset);
-        // Log::debug("Rate Total: " . $this->rate_total);
-    }
-
-    /**
      * getDeviceList
      * Returns Full Device List
+     *
+     * @return array<mixed>|string
      */
-    public function getDeviceList(int $array=0) : string|array
+    public function getDeviceList(int $array = 0): string|array
     {
         $url = self::API_URL . self::DEVICE_ENDPOINT;
         $response = $this->makeAPICall('GET', $url);
-        return $array === 1 ? json_decode($response->getBody(), true) : $response->getBody();
+        if ($response === null) {
+            return 'API Error';
+        } else {
+            return $array === 1 ? json_decode($response->getBody(), true) : $response->getBody();    
+        }
     }
 
     /**
      * getDeviceCount
      * Returns total number of controllable devices
-     *
-     * @return int
      */
     public function getDeviceCount(): int
     {
-        return count($this->getDeviceList(1)['data']);
+        return $data = isset($this->getDeviceList(1)['data']) ?
+        count($this->getDeviceList(1)['data']) :
+        0;
     }
 
     /**
      * getDeviceMACArray
      * Returns array of controllable MAC addresses
+     *
+     * @return array<string>
      */
-    public function getDeviceMACArray() : array
+    public function getDeviceMACArray(): array
     {
-        $array = $this->getDeviceList(1)['data'];
-
-        foreach ($array as $devices) {
-            $dev[] = $devices['device'];
+        $list = $this->getDeviceList(1);
+        $dev = [];
+    
+        // Check if 'data' key exists and is an array
+        if (is_array($list) && array_key_exists('data', $list)) {
+            $array = $list['data'];
+            
+            foreach ($array as $devices) {
+                if (isset($devices['device'])) {
+                    $dev[] = $devices['device'];
+                }
+            }
         }
-
+    
         return $dev;
     }
+    
 
     /**
      * getDeviceNameArray
      * Returns Array of Device Names
      *
-     * @return array
+     * @return array<string>
      */
-    public function getDeviceNameArray()
+    public function getDeviceNameArray(): array
     {
-        $array = $this->getDeviceList()['data'];
-
-        foreach ($array as $devices) {
-            $dev[] = $devices['deviceName'];
+        $list = $this->getDeviceList(1);
+        $dev = [];
+    
+        // Check if 'data' key exists and is an array
+        if (is_array($list) && array_key_exists('data', $list)) {
+            $array = $list['data'];
+            
+            foreach ($array as $devices) {
+                if (isset($devices['deviceName'])) {
+                    $dev[] = $devices['deviceName'];
+                }
+            }
         }
-
+    
         return $dev;
     }
 
     /**
      * getAPIToken
      * Returns the stored API Token
-     *
-     * @return string
      */
     protected function getAPIToken(): string
     {
@@ -178,9 +183,9 @@ class Connect
      * setHeaders
      * Sets the headers using the API Token
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function setHeaders()
+    public function setHeaders(): array
     {
         return [
             'User-Agent' => 'testing/1.0',
@@ -189,10 +194,15 @@ class Connect
         ];
     }
 
-    public function makeAPICall($type, $url, $body = null)
+    /**
+     * makeAPICall
+     * Makes the API Call
+     */
+    public function makeAPICall(string $type, string $url, string $body = null): ?ResponseInterface
     {
         $data['headers'] = $this->setHeaders();
         $data['body'] = $body;
+        $request = null; // Initialize $request to null
 
         if ($this->checkPing()) {
             try {
@@ -200,18 +210,22 @@ class Connect
             } catch (RequestException $e) {
                 if ($e->hasResponse()) {
                     $response = $e->getResponse();
-                    print $response->getBody();
+
+                    if ($response !== null) {
+                        Log::error('API Error: ' . $response->getBody());
+                    }
 
                     exit;
                 }
             }
+        } else {
+            return null; // Handle ping failure case
         }
-        $this->setRateVars($request->getHeaders());
 
         return $request;
     }
 
-    public function checkPing()
+    public function checkPing(): bool
     {
         $url = self::API_URL . self::PING_ENDPOINT;
         $response = $this->client->request('GET', $url);
@@ -227,5 +241,4 @@ class Connect
 
         die('API Seems Offline or you have connectivity issues at present.');
     }
-
 }
