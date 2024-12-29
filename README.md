@@ -85,4 +85,4 @@ Array
 
 ## Contributing
 
-If you're having problems, spot a bug, or have a feature suggestion, [file an issue](https://github.com/dutchie027/govee-api/issues). If you want, feel free to fork the package and make a pull request. This is a work in progresss as I get more info and the Govee API grows.
+If you're having problems, spot a bug, or have a feature suggestion, [file an issue](https://github.com/dutchie027/govee-api-v2/issues). If you want, feel free to fork the package and make a pull request. This is a work in progresss as I get more info and the Govee API grows.
