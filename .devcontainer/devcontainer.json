@@ -26,9 +26,9 @@
     }
   },
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [
-    8080,9000
-  ],
+  // "forwardPorts": [
+  //   8080,9000
+  // ],
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "if [ -f composer.json ];then composer install;fi",
   // "postCreateCommand": "docker-php-ext-install pdo pdo_mysql",
