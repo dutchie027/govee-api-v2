@@ -26,12 +26,12 @@
         "fix": "./vendor/bin/php-cs-fixer fix",
         "test": "./vendor/bin/phpunit",
         "stan": "./vendor/bin/phpstan --no-progress",
-        "psalm": "./vendor/bin/psalm.phar --no-progress --show-info=true",
+        "insight": "./vendor/bin/phpinsights",
         "runall": [
             "@fix",
             "@test",
             "@stan",
-            "@psalm"
+            "@insight"
         ]
     },
     "scripts-descriptions": {
@@ -43,6 +43,12 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.66",
         "phpunit/phpunit": "^11.5",
-        "phpstan/phpstan": "^2.0"
+        "phpstan/phpstan": "^2.0",
+        "nunomaduro/phpinsights": "^2.12"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }
