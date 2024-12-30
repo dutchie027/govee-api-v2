@@ -38,13 +38,11 @@
         "test": "Runs phpunit tests",
         "fix": "Runs PHP-CS Fixer",
         "stan": "Runs phpstan to check standards",
-        "psalm": "Runs psalm to check code",
         "runall": "Runs all tests (fixer, phpunit, phpstan, psalm)"
     },
     "require-dev": {
-        "phpstan/phpstan": "^2.0",
-        "vimeo/psalm": "^5.26",
         "friendsofphp/php-cs-fixer": "^3.66",
-        "phpunit/phpunit": "^3.7"
+        "phpunit/phpunit": "^11.5",
+        "phpstan/phpstan": "^2.0"
     }
 }
