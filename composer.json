@@ -2,6 +2,8 @@
     "name": "dutchie027/govee-api-v2",
     "description": "API Using Govee's newer OpenAPI Spec",
     "type": "library",
+    "keywords": ["php", "home automation", "govee", "lights", "plugs", "API", "thermostats", "control"],
+    "license": "MIT",
     "require": {
         "monolog/monolog": "^3.8",
         "guzzlehttp/guzzle": "^7.9",
