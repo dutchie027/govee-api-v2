@@ -43,7 +43,7 @@ class Connect
      *
      * @const string
      */
-    public const DEVICE_STATE = self::API_URL . self::DEVICE_ENDPOINT . '/state';
+    public const DEVICE_STATE = self::API_URL . '/router/api/v1/device/state';
 
     /**
      * API Token
@@ -51,6 +51,31 @@ class Connect
      * @var string
      */
     private $p_token;
+
+    /**
+     * @var array<string, string>
+     */
+    private $name_hash = [];
+
+    /**
+     * @var array<string>
+     */
+    private $name_array = [];
+
+    /**
+     * @var array<string, string>
+     */
+    private $mac_hash = [];
+
+    /**
+     * @var array<string>
+     */
+    private $mac_array = [];
+
+    /**
+     * @var array<string,string>
+     */
+    private $sku_hash = [];
 
     /**
      * Remaining Times To Call the API
@@ -89,6 +114,7 @@ class Connect
         $dotenv->load();
         $this->p_token = $_ENV['API_TOKEN'];
         $this->client = $client ?: new Guzzle();
+        $this->loadAllDevices();
     }
 
     /**
@@ -101,11 +127,12 @@ class Connect
     {
         $url = self::API_URL . self::DEVICE_ENDPOINT;
         $response = $this->makeAPICall('GET', $url);
+
         if ($response === null) {
             return 'API Error';
-        } else {
-            return $array === 1 ? json_decode($response->getBody(), true) : $response->getBody();    
         }
+
+        return $array === 1 ? json_decode($response->getBody(), true) : $response->getBody();
     }
 
     /**
@@ -114,9 +141,7 @@ class Connect
      */
     public function getDeviceCount(): int
     {
-        return $data = isset($this->getDeviceList(1)['data']) ?
-        count($this->getDeviceList(1)['data']) :
-        0;
+        return count($this->name_array);
     }
 
     /**
@@ -125,25 +150,12 @@ class Connect
      *
      * @return array<string>
      */
-    public function getDeviceMACArray(): array
+    public function getDeviceMACArray(string $sort = null): array
     {
-        $list = $this->getDeviceList(1);
-        $dev = [];
-    
-        // Check if 'data' key exists and is an array
-        if (is_array($list) && array_key_exists('data', $list)) {
-            $array = $list['data'];
-            
-            foreach ($array as $devices) {
-                if (isset($devices['device'])) {
-                    $dev[] = $devices['device'];
-                }
-            }
-        }
-    
-        return $dev;
+        $sort === 'asc' ? sort($this->mac_array) : ($sort === 'desc' ? rsort($this->mac_array) : null);
+
+        return $this->mac_array;
     }
-    
 
     /**
      * getDeviceNameArray
@@ -151,23 +163,11 @@ class Connect
      *
      * @return array<string>
      */
-    public function getDeviceNameArray(): array
+    public function getDeviceNameArray(string $sort = null): array
     {
-        $list = $this->getDeviceList(1);
-        $dev = [];
-    
-        // Check if 'data' key exists and is an array
-        if (is_array($list) && array_key_exists('data', $list)) {
-            $array = $list['data'];
-            
-            foreach ($array as $devices) {
-                if (isset($devices['deviceName'])) {
-                    $dev[] = $devices['deviceName'];
-                }
-            }
-        }
-    
-        return $dev;
+        $sort === 'asc' ? sort($this->name_array) : ($sort === 'desc' ? rsort($this->name_array) : null);
+
+        return $this->name_array;
     }
 
     /**
@@ -240,5 +240,81 @@ class Connect
         }
 
         die('API Seems Offline or you have connectivity issues at present.');
+    }
+
+    private function getDeviceMAC(string $device): string
+    {
+        if (preg_match('/^([a-fA-F0-9]{2}\:){7}[a-fA-F0-9]{2}$/', $device)) {
+            return $device;
+        }
+
+        if (in_array($device, $this->mac_hash, true)) {
+            return $this->name_hash[$device];
+        }
+
+        die('Device Not Found');
+    }
+
+    public function getDeviceState(string $device): string
+    {
+        $mac = $this->getDeviceMAC($device);
+        $model = $this->sku_hash[$mac];
+
+        $jsonPayload = $this->createPostPayload($model, $mac);
+
+        $url = self::DEVICE_STATE;
+        $response = $this->makeAPICall('POST', $url, $jsonPayload);
+
+        if ($response === null) {
+            return 'API Error';
+        }
+
+        return $response->getBody();
+    }
+
+    private function createPostPayload(string $sku, string $device): string
+    {
+        $payload = [
+            'requestId' => 'uuid',
+            'payload' => [
+                'sku' => $sku,
+                'device' => $device,
+            ],
+        ];
+
+        if (($json = json_encode($payload)) === false) {
+            // Handle the error
+            error_log('Failed to encode JSON: ' . json_last_error_msg());
+
+            // Provide a default response or take other actions
+            return '';
+        }
+
+        // Continue with the JSON-encoded payload
+        return $json;
+    }
+
+    /**
+     * loadAllDevices
+     * Called by the constructor. Pre-Loads arrays/hashes to reference
+     * lights by either MAC address or name
+     *
+     * @return void
+     */
+    private function loadAllDevices()
+    {
+        $all_devices = $this->getDeviceList(1);
+        $devices = (is_array($all_devices) && array_key_exists('data', $all_devices)) ? $all_devices['data'] : [];
+
+        foreach ($devices as $device) {
+            $name = $device['deviceName'];
+            $mac = $device['device'];
+            $model = $device['sku'];
+            $this->name_hash[$name] = $mac;
+            $this->name_array[] = $name;
+            $this->mac_hash[$mac] = $name;
+            $this->mac_array[] = $mac;
+            $this->sku_hash[$mac] = $model;
+        }
     }
 }
