@@ -19,27 +19,30 @@ class ConnectTest extends TestCase
 
     protected function setUp(): void
     {
-        // Mock environment variables
+        // Set environment variables first
+        $_ENV['GOVEE_API_KEY'] = self::TEST_API_KEY;
+        $_ENV['LOG_DIR'] = '/tmp/govee-tests';
+        $_ENV['LOG_PREFIX'] = 'govee_test';
+        $_ENV['LOG_LEVEL'] = '200';
+
+        // Also set using putenv for redundancy
         putenv('GOVEE_API_KEY=' . self::TEST_API_KEY);
         putenv('LOG_DIR=/tmp/govee-tests');
         putenv('LOG_PREFIX=govee_test');
         putenv('LOG_LEVEL=200');
 
-        // Set up mock HTTP client
+        // Rest of the setup remains the same
         $this->mockHandler = new MockHandler();
         $handlerStack = HandlerStack::create($this->mockHandler);
         $client = new Client(['handler' => $handlerStack]);
 
-        // Create Connect instance and set properties
         $this->connect = new Connect();
         
-        // Mock the client before any API calls
         $reflection = new \ReflectionClass($this->connect);
         $clientProperty = $reflection->getProperty('client');
         $clientProperty->setAccessible(true);
         $clientProperty->setValue($this->connect, $client);
 
-        // Set the token property
         $tokenProperty = $reflection->getProperty('p_token');
         $tokenProperty->setAccessible(true);
         $tokenProperty->setValue($this->connect, self::TEST_API_KEY);

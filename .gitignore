@@ -3,7 +3,6 @@
 /logs/
 /resources/
 /.build/
-.php-cs-fixer.cache
-.phpunit.result.cache
+*.cache
 .env
 test.php
