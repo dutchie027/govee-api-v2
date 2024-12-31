@@ -19,33 +19,39 @@ class ConnectTest extends TestCase
 
     protected function setUp(): void
     {
-        // Set environment variables first
-        $_ENV['GOVEE_API_KEY'] = self::TEST_API_KEY;
+        // Define test constants
+        define('TEST_API_KEY', 'mock-api-key-12345');
+
+        // Set environment variables using multiple methods for compatibility
+        $_ENV['GOVEE_API_KEY'] = TEST_API_KEY;
+        $_SERVER['GOVEE_API_KEY'] = TEST_API_KEY;
+        putenv('GOVEE_API_KEY=' . TEST_API_KEY);
+
+        // Set other required environment variables
         $_ENV['LOG_DIR'] = '/tmp/govee-tests';
         $_ENV['LOG_PREFIX'] = 'govee_test';
         $_ENV['LOG_LEVEL'] = '200';
 
-        // Also set using putenv for redundancy
-        putenv('GOVEE_API_KEY=' . self::TEST_API_KEY);
-        putenv('LOG_DIR=/tmp/govee-tests');
-        putenv('LOG_PREFIX=govee_test');
-        putenv('LOG_LEVEL=200');
-
-        // Rest of the setup remains the same
+        // Initialize mock client
         $this->mockHandler = new MockHandler();
         $handlerStack = HandlerStack::create($this->mockHandler);
         $client = new Client(['handler' => $handlerStack]);
 
+        // Create and configure Connect instance
         $this->connect = new Connect();
-        
+
+        // Use reflection to set private properties
         $reflection = new \ReflectionClass($this->connect);
+
+        // Set client
         $clientProperty = $reflection->getProperty('client');
         $clientProperty->setAccessible(true);
         $clientProperty->setValue($this->connect, $client);
 
+        // Ensure token is set
         $tokenProperty = $reflection->getProperty('p_token');
         $tokenProperty->setAccessible(true);
-        $tokenProperty->setValue($this->connect, self::TEST_API_KEY);
+        $tokenProperty->setValue($this->connect, TEST_API_KEY);
     }
 
     protected function tearDown(): void
@@ -82,11 +88,11 @@ class ConnectTest extends TestCase
             new Response(200, [], json_encode(['data' => 'pong']))
         );
 
-        // Mock failed request
+        // Mock failed request with proper exception
         $this->mockHandler->append(
             new RequestException(
-                'Error message',
-                new Request('GET', 'test-url')
+                'Server Error',
+                new Request('GET', '/test-endpoint')
             )
         );
 
@@ -133,7 +139,7 @@ class ConnectTest extends TestCase
         );
 
         $response = $this->connect->makeAPICall('GET', '/test-endpoint');
-        
+
         $this->assertEquals('98', $response->getHeader('X-RateLimit-Remaining')[0]);
         $this->assertEquals('100', $response->getHeader('X-RateLimit-Total')[0]);
         $this->assertEquals('60', $response->getHeader('X-RateLimit-Reset')[0]);
