@@ -19,39 +19,30 @@ class ConnectTest extends TestCase
 
     protected function setUp(): void
     {
-        // Define test constants
-        define('TEST_API_KEY', 'mock-api-key-12345');
+        // Mock environment variables
+        putenv('GOVEE_API_KEY=' . self::TEST_API_KEY);
+        putenv('LOG_DIR=/tmp/govee-tests');
+        putenv('LOG_PREFIX=govee_test');
+        putenv('LOG_LEVEL=200');
 
-        // Set environment variables using multiple methods for compatibility
-        $_ENV['GOVEE_API_KEY'] = TEST_API_KEY;
-        $_SERVER['GOVEE_API_KEY'] = TEST_API_KEY;
-        putenv('GOVEE_API_KEY=' . TEST_API_KEY);
-
-        // Set other required environment variables
-        $_ENV['LOG_DIR'] = '/tmp/govee-tests';
-        $_ENV['LOG_PREFIX'] = 'govee_test';
-        $_ENV['LOG_LEVEL'] = '200';
-
-        // Initialize mock client
+        // Set up mock HTTP client
         $this->mockHandler = new MockHandler();
         $handlerStack = HandlerStack::create($this->mockHandler);
         $client = new Client(['handler' => $handlerStack]);
 
-        // Create and configure Connect instance
+        // Create Connect instance and set properties
         $this->connect = new Connect();
 
-        // Use reflection to set private properties
+        // Mock the client before any API calls
         $reflection = new \ReflectionClass($this->connect);
-
-        // Set client
         $clientProperty = $reflection->getProperty('client');
         $clientProperty->setAccessible(true);
         $clientProperty->setValue($this->connect, $client);
 
-        // Ensure token is set
+        // Set the token property
         $tokenProperty = $reflection->getProperty('p_token');
         $tokenProperty->setAccessible(true);
-        $tokenProperty->setValue($this->connect, TEST_API_KEY);
+        $tokenProperty->setValue($this->connect, self::TEST_API_KEY);
     }
 
     protected function tearDown(): void
