@@ -5,7 +5,7 @@
          colors="true"
          verbose="true">
     <testsuites>
-        <testsuite name="Govee API Test Suite">
+        <testsuite name="Govee APIv2 Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

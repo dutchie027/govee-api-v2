@@ -4,5 +4,6 @@
 /resources/
 /.build/
 .php-cs-fixer.cache
+.phpunit.result.cache
 .env
 test.php
