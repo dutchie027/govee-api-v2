@@ -111,7 +111,7 @@ class Connect
     public function __construct(Guzzle $client = null)
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-        $dotenv->load();
+        $dotenv->safeLoad();
         $this->p_token = $_ENV['API_TOKEN'];
         $this->client = $client ?: new Guzzle();
         $this->loadAllDevices();
