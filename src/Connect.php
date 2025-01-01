@@ -214,7 +214,10 @@ class Connect
                         Log::error('API Error: ' . $response->getBody());
                     }
                     Log::error($url);
-                    Log::error($body);
+
+                    if (isset($body)) {
+                        Log::error($body);
+                    }
 
                     exit;
                 }
@@ -271,6 +274,12 @@ class Connect
         return $response->getBody();
     }
 
+    /**
+     * createPostPayload
+     * Creates the JSON payload for the API
+     *
+     * @param array<mixed>|null $capability
+     */
     public function createPostPayload(string $sku, string $device, array|null $capability = []): string
     {
         $payload = [
@@ -301,10 +310,8 @@ class Connect
      * loadAllDevices
      * Called by the constructor. Pre-Loads arrays/hashes to reference
      * lights by either MAC address or name
-     *
-     * @return void
      */
-    private function loadAllDevices()
+    private function loadAllDevices(): void
     {
         $all_devices = $this->getDeviceList(1);
         $devices = (is_array($all_devices) && array_key_exists('data', $all_devices)) ? $all_devices['data'] : [];
@@ -321,7 +328,7 @@ class Connect
         }
     }
 
-    public function control()
+    public function control(): Control
     {
         return new Control($this);
     }
