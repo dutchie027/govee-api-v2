@@ -22,21 +22,21 @@ class Connect
      *
      * @const string
      */
-    public const PING_ENDPOINT = '/ping';
+    public const PING_ENDPOINT = self::API_URL . '/ping';
 
     /**
      * RAW Device Endpoint
      *
      * @const string
      */
-    public const DEVICE_ENDPOINT = '/router/api/v1/user/devices';
+    public const DEVICE_ENDPOINT = self::API_URL . '/router/api/v1/user/devices';
 
     /**
      * Control Endpoint
      *
      * @const string
      */
-    public const DEVICE_CONTROL = self::API_URL . self::DEVICE_ENDPOINT . '/control';
+    public const DEVICE_CONTROL = self::API_URL . '/router/api/v1/device/control';
 
     /**
      * Device State Endpoint
@@ -125,8 +125,7 @@ class Connect
      */
     public function getDeviceList(int $array = 0): string|array
     {
-        $url = self::API_URL . self::DEVICE_ENDPOINT;
-        $response = $this->makeAPICall('GET', $url);
+        $response = $this->makeAPICall('GET', self::DEVICE_ENDPOINT);
 
         if ($response === null) {
             return 'API Error';
@@ -214,6 +213,8 @@ class Connect
                     if ($response !== null) {
                         Log::error('API Error: ' . $response->getBody());
                     }
+                    Log::error($url);
+                    Log::error($body);
 
                     exit;
                 }
@@ -227,8 +228,7 @@ class Connect
 
     public function checkPing(): bool
     {
-        $url = self::API_URL . self::PING_ENDPOINT;
-        $response = $this->client->request('GET', $url);
+        $response = $this->client->request('GET', self::PING_ENDPOINT);
 
         if ($response->getStatusCode() == 200) {
             // in future we might want to regex match the word
@@ -242,7 +242,7 @@ class Connect
         die('API Seems Offline or you have connectivity issues at present.');
     }
 
-    private function getDeviceMAC(string $device): string
+    public function getDeviceMAC(string $device): string
     {
         if (preg_match('/^([a-fA-F0-9]{2}\:){7}[a-fA-F0-9]{2}$/', $device)) {
             return $device;
@@ -262,8 +262,7 @@ class Connect
 
         $jsonPayload = $this->createPostPayload($model, $mac);
 
-        $url = self::DEVICE_STATE;
-        $response = $this->makeAPICall('POST', $url, $jsonPayload);
+        $response = $this->makeAPICall('POST', self::DEVICE_STATE, $jsonPayload);
 
         if ($response === null) {
             return 'API Error';
@@ -272,7 +271,7 @@ class Connect
         return $response->getBody();
     }
 
-    private function createPostPayload(string $sku, string $device): string
+    public function createPostPayload(string $sku, string $device, array|null $capability = []): string
     {
         $payload = [
             'requestId' => 'uuid',
@@ -281,6 +280,10 @@ class Connect
                 'device' => $device,
             ],
         ];
+
+        if (isset($capability) && !empty($capability)) {
+            $payload['payload']['capability'] = $capability;
+        }
 
         if (($json = json_encode($payload)) === false) {
             // Handle the error
@@ -316,5 +319,10 @@ class Connect
             $this->mac_array[] = $mac;
             $this->sku_hash[$mac] = $model;
         }
+    }
+
+    public function control()
+    {
+        return new Control($this);
     }
 }

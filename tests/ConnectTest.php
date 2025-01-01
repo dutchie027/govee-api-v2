@@ -2,14 +2,14 @@
 
 namespace Tests\dutchie027\GoveeApiV2;
 
-use PHPUnit\Framework\TestCase;
 use dutchie027\GoveeApiV2\Connect;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 
 class ConnectTest extends TestCase
 {
@@ -68,8 +68,8 @@ class ConnectTest extends TestCase
 
         $response = $this->connect->makeAPICall('GET', '/test-endpoint');
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(json_encode($expectedResponse), $response->getBody()->getContents());
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals(json_encode($expectedResponse), $response->getBody()->getContents());
     }
 
     public function testFailedRequest(): void
@@ -88,10 +88,8 @@ class ConnectTest extends TestCase
         );
 
         $response = $this->connect->makeAPICall('GET', '/test-endpoint');
-        $this->assertNull($response);
+        self::assertNull($response);
     }
-
-
 
     public function testPostRequestWithPayload(): void
     {
@@ -109,8 +107,8 @@ class ConnectTest extends TestCase
         $payload = json_encode(['data' => 'test']);
         $response = $this->connect->makeAPICall('POST', '/test-endpoint', $payload);
 
-        $this->assertEquals(201, $response->getStatusCode());
-        $this->assertEquals(json_encode($expectedResponse), $response->getBody()->getContents());
+        self::assertEquals(201, $response->getStatusCode());
+        self::assertEquals(json_encode($expectedResponse), $response->getBody()->getContents());
     }
 
     public function testRateLimitHeaders(): void
@@ -125,15 +123,15 @@ class ConnectTest extends TestCase
             new Response(200, [
                 'X-RateLimit-Remaining' => '98',
                 'X-RateLimit-Total' => '100',
-                'X-RateLimit-Reset' => '60'
+                'X-RateLimit-Reset' => '60',
             ], '{"status":"success"}')
         );
 
         $response = $this->connect->makeAPICall('GET', '/test-endpoint');
 
-        $this->assertEquals('98', $response->getHeader('X-RateLimit-Remaining')[0]);
-        $this->assertEquals('100', $response->getHeader('X-RateLimit-Total')[0]);
-        $this->assertEquals('60', $response->getHeader('X-RateLimit-Reset')[0]);
+        self::assertEquals('98', $response->getHeader('X-RateLimit-Remaining')[0]);
+        self::assertEquals('100', $response->getHeader('X-RateLimit-Total')[0]);
+        self::assertEquals('60', $response->getHeader('X-RateLimit-Reset')[0]);
     }
 
     public function testCreatePostPayload(): void
@@ -144,10 +142,10 @@ class ConnectTest extends TestCase
         $result = $method->invoke($this->connect, 'TEST-SKU', 'TEST-DEVICE');
         $decoded = json_decode($result, true);
 
-        $this->assertIsArray($decoded);
-        $this->assertArrayHasKey('requestId', $decoded);
-        $this->assertArrayHasKey('payload', $decoded);
-        $this->assertEquals('TEST-SKU', $decoded['payload']['sku']);
-        $this->assertEquals('TEST-DEVICE', $decoded['payload']['device']);
+        self::assertIsArray($decoded);
+        self::assertArrayHasKey('requestId', $decoded);
+        self::assertArrayHasKey('payload', $decoded);
+        self::assertEquals('TEST-SKU', $decoded['payload']['sku']);
+        self::assertEquals('TEST-DEVICE', $decoded['payload']['device']);
     }
 }
