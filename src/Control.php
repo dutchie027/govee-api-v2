@@ -22,7 +22,7 @@ class Control
     /**
      * power
      */
-    public function power(string $device, int $onoff = null): string
+    public function power(string $device, ?int $onoff): string
     {
         $body = '';
 
@@ -33,6 +33,7 @@ class Control
 
         // Iterate through capabilities and check for type
         foreach ($data['payload']['capabilities'] as $capability) {
+
             $typeString = $capability['type'];
             $typeParts = explode('.', $typeString);
             $lastPart = end($typeParts);
@@ -42,7 +43,7 @@ class Control
                 if ($onoff === 0 || $onoff === 1) {
                     $currval = $onoff;
                 } else {
-                    $currval = $data['payload']['capabilities'][0]['state']['value'];
+                    $currval = $capability['state']['value'];
                     $currval = $currval ^ 1;
                 }
                 
