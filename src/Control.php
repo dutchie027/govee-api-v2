@@ -22,9 +22,10 @@ class Control
     /**
      * power
      */
-    public function power(string $device): string
+    public function power(string $device, int $onoff = null): string
     {
         $body = '';
+
         $jsonString = $this->client->getDeviceState($device);
 
         // Decode JSON string into PHP associative array
@@ -37,9 +38,14 @@ class Control
             $lastPart = end($typeParts);
 
             if ($lastPart == 'on_off') {
-                $currval = $data['payload']['capabilities'][0]['state']['value'];
-                $currval = $currval ^ 1;
 
+                if ($onoff === 0 || $onoff === 1) {
+                    $currval = $onoff;
+                } else {
+                    $currval = $data['payload']['capabilities'][0]['state']['value'];
+                    $currval = $currval ^ 1;
+                }
+                
                 $extra = [
                     'type' => 'devices.capabilities.on_off',
                     'instance' => 'powerSwitch',

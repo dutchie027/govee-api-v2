@@ -41,16 +41,22 @@ final class Log
      */
     protected static function configureInstance(): void
     {
-        if (!file_exists($_ENV['LOG_DIR'])) {
-            mkdir($_ENV['LOG_DIR'], 0700, true);
+        $logDir = $_ENV['LOG_DIR'] ?? './';
+        $logPrefix = $_ENV['LOG_PREFIX'] ?? 'govee-api-v2';
+        $logLevel = $_ENV['LOG_LEVEL'] ?? 200; // Default log level to 200 (INFO)
+    
+        if (!file_exists($logDir)) {
+            mkdir($logDir, 0700, true);
         }
-        $logger = new Logger($_ENV['LOG_PREFIX']);
-        $log_level = in_array($_ENV['LOG_LEVEL'], self::ALLOWED_LEVELS, true) ? $_ENV['LOG_LEVEL'] : 200;
-        $logger->pushHandler(new StreamHandler($_ENV['LOG_DIR'] . DIRECTORY_SEPARATOR . $_ENV['LOG_PREFIX'] . '.log', $log_level));
+        
+        $logger = new Logger($logPrefix);
+        $logLevel = in_array($logLevel, self::ALLOWED_LEVELS, true) ? $logLevel : 200;
+        $logger->pushHandler(new StreamHandler($logDir . DIRECTORY_SEPARATOR . $logPrefix . '.log', $logLevel));
+        
         self::$instance = $logger;
         self::$is_set = true;
     }
-
+    
     /**
      * Add Debug Message
      *

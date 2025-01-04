@@ -108,15 +108,22 @@ class Connect
     /**
      * Default constructor
      */
-    public function __construct(Guzzle $client = null)
+    public function __construct(string $apitoken = null, Guzzle $client = null)
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
         $dotenv->safeLoad();
-        $this->p_token = $_ENV['API_TOKEN'];
+        
+        // Check if $apitoken is a valid GUID
+        if ($apitoken && preg_match('/^\{?[A-F0-9]{8}\-[A-F0-9]{4}\-[A-F0-9]{4}\-[A-F0-9]{4}\-[A-F0-9]{12}\}?$/i', $apitoken)) {
+            $this->p_token = $apitoken;
+        } else {
+            $this->p_token = $_ENV['API_TOKEN'];
+        }
+        
         $this->client = $client ?: new Guzzle();
         $this->loadAllDevices();
     }
-
+    
     /**
      * getDeviceList
      * Returns Full Device List
