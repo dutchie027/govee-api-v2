@@ -339,4 +339,9 @@ class Connect
     {
         return new Control($this);
     }
+
+    public function common(): Common
+    {
+        return new Common($this);
+    }
 }
