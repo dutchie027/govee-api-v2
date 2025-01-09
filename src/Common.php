@@ -33,7 +33,11 @@ class Common
         // Iterate through the capabilities
         foreach ($data['payload']['capabilities'] as $capability) {
             if ($capability['instance'] === $instance) {
-                $stateValue = $capability['state']['value'];
+                if ($instance === 'sensorHumidity') {
+                    $stateValue = $capability['state']['value']['currentHumidity'];
+                } else {
+                    $stateValue = $capability['state']['value'];
+                }
                 break;
             }
         }
