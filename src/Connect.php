@@ -108,7 +108,7 @@ class Connect
     /**
      * Default constructor
      */
-    public function __construct(string $apitoken = null, Guzzle $client = null)
+    public function __construct(?string $apitoken = null, Guzzle $client = null)
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
         $dotenv->safeLoad();
