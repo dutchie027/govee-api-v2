@@ -38,6 +38,7 @@ class Common
                 } else {
                     $stateValue = $capability['state']['value'];
                 }
+
                 break;
             }
         }
@@ -45,12 +46,17 @@ class Common
         return (int) $stateValue;
     }
 
+    /**
+     * Convert integer to RGB array
+     *
+     * @return array<int> $colors
+     */
     public function intToRGB(int $rgb): array
     {
         $colors['r'] = ($rgb >> 16) & 0xFF;
         $colors['g'] = ($rgb >> 8) & 0xFF;
         $colors['b'] = $rgb & 0xFF;
-        return $colors;
-            }
 
+        return $colors;
+    }
 }

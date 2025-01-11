@@ -33,20 +33,18 @@ class Control
 
         // Iterate through capabilities and check for type
         foreach ($data['payload']['capabilities'] as $capability) {
-
             $typeString = $capability['type'];
             $typeParts = explode('.', $typeString);
             $lastPart = end($typeParts);
 
             if ($lastPart == 'on_off') {
-
                 if ($onoff === 0 || $onoff === 1) {
                     $currval = $onoff;
                 } else {
                     $currval = $capability['state']['value'];
                     $currval = $currval ^ 1;
                 }
-                
+
                 $extra = [
                     'type' => 'devices.capabilities.on_off',
                     'instance' => 'powerSwitch',

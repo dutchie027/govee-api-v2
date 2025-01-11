@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
-use dutchie027\GoveeApiV2\Control;
 use dutchie027\GoveeApiV2\Connect;
+use dutchie027\GoveeApiV2\Control;
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 
 class ControlTest extends TestCase
 {
@@ -43,13 +43,13 @@ class ControlTest extends TestCase
             ],
         ];
 
-        $this->control->expects($this->once())
+        $this->control->expects(self::once())
                       ->method('setColorTemperature')
                       ->with($data, 3000)
                       ->willReturn('success');
 
         $result = $this->control->setColorTemperature($data, 3000);
-        $this->assertEquals('success', $result);
+        self::assertEquals('success', $result);
     }
 
     public function testSetColorTemperatureOutOfRange()
@@ -108,7 +108,7 @@ class ControlTest extends TestCase
 
         $result = $this->control->setColorTemperature($data, 3000);
 
-        $this->assertEquals('API Error', $result);
+        self::assertEquals('API Error', $result);
     }
 
     public function testSetColorTemperatureAtMinimumBoundary()
@@ -139,7 +139,7 @@ class ControlTest extends TestCase
                       ->willReturn(new Response(200, [], 'success'));
 
         $result = $this->control->setColorTemperature($data, 2000);
-        $this->assertEquals('success', $result);
+        self::assertEquals('success', $result);
     }
 
     public function testSetColorTemperatureAtMaximumBoundary()
@@ -170,7 +170,7 @@ class ControlTest extends TestCase
                       ->willReturn(new Response(200, [], 'success'));
 
         $result = $this->control->setColorTemperature($data, 6500);
-        $this->assertEquals('success', $result);
+        self::assertEquals('success', $result);
     }
 
     public function testSetColorTemperatureWithMalformedData()
@@ -180,8 +180,8 @@ class ControlTest extends TestCase
 
         $malformedData = [
             'payload' => [
-                'capabilities' => []
-            ]
+                'capabilities' => [],
+            ],
         ];
 
         $this->control->setColorTemperature($malformedData, 3000);

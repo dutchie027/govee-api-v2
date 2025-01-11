@@ -108,22 +108,22 @@ class Connect
     /**
      * Default constructor
      */
-    public function __construct(?string $apitoken = null, Guzzle $client = null)
+    public function __construct(?string $apitoken = null, ?Guzzle $client = null)
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
         $dotenv->safeLoad();
-        
+
         // Check if $apitoken is a valid GUID
         if ($apitoken && preg_match('/^\{?[A-F0-9]{8}\-[A-F0-9]{4}\-[A-F0-9]{4}\-[A-F0-9]{4}\-[A-F0-9]{12}\}?$/i', $apitoken)) {
             $this->p_token = $apitoken;
         } else {
             $this->p_token = $_ENV['API_TOKEN'];
         }
-        
+
         $this->client = $client ?: new Guzzle();
         $this->loadAllDevices();
     }
-    
+
     /**
      * getDeviceList
      * Returns Full Device List
@@ -156,7 +156,7 @@ class Connect
      *
      * @return array<string>
      */
-    public function getDeviceMACArray(string $sort = null): array
+    public function getDeviceMACArray(?string $sort = null): array
     {
         $sort === 'asc' ? sort($this->mac_array) : ($sort === 'desc' ? rsort($this->mac_array) : null);
 
@@ -169,7 +169,7 @@ class Connect
      *
      * @return array<string>
      */
-    public function getDeviceNameArray(string $sort = null): array
+    public function getDeviceNameArray(?string $sort = null): array
     {
         $sort === 'asc' ? sort($this->name_array) : ($sort === 'desc' ? rsort($this->name_array) : null);
 
@@ -204,7 +204,7 @@ class Connect
      * makeAPICall
      * Makes the API Call
      */
-    public function makeAPICall(string $type, string $url, string $body = null): ?ResponseInterface
+    public function makeAPICall(string $type, string $url, ?string $body = null): ?ResponseInterface
     {
         $data['headers'] = $this->setHeaders();
         $data['body'] = $body;
